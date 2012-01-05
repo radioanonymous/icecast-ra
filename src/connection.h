@@ -27,6 +27,7 @@
 struct source_tag;
 struct ice_config_tag;
 typedef struct connection_tag connection_t;
+typedef struct iovec IOVEC;
 
 #include "compat.h"
 #include "httpp/httpp.h"
