@@ -40,6 +40,7 @@
 
 #include "logging.h"
 #include "auth.h"
+#include "chardet.h"
 
 #define CATMODULE "admin"
 
@@ -970,6 +971,22 @@ static int command_metadata (client_t *client, source_t *source, int response)
     {
         if (same_ip == 0 || plugin == NULL)
             break;
+		/* Charset detection (if none specified) */
+		if (!charset) {
+			const char *r;
+			int len;
+			charset = "UTF8";
+#define CCONV(s) \
+			if (s && (r = auto_recode(s))) { \
+				len = strlen(r); \
+				s = alloca(len + 1); \
+				memcpy((char*)s, r, len + 1); \
+			}
+			CCONV(title);
+			CCONV(song);
+			CCONV(artist);
+		}
+		/* Now send prepared metadata */
         if (artwork)
             stats_event (source->mount, "artwork", artwork);
         if (plugin->set_tag)
