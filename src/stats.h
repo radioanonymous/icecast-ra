@@ -67,5 +67,8 @@ void stats_set_conv (long handle, const char *name, const char *value, const cha
 
 void stats_listener_to_xml (client_t *listener, xmlNodePtr parent);
 
+void json_stats_update(const char *mount, const char *artist, const char *title, long listeners);
+void json_stats_stop(const char *mount);
+
 #endif  /* __STATS_H__ */
 

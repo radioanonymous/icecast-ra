@@ -366,6 +366,7 @@ static void mp3_set_title (source_t *source)
             r = snprintf (p->data, size, "%c%s%s", len_byte, streamtitle, source_mp3->url_title);
             stats_event (source->mount, "title", p->data+14);
         }
+		json_stats_update(source->mount, source_mp3->url_artist, source_mp3->url_title, source->listeners);
         logging_playlist (source->mount, p->data+14, source->listeners);
         strcat (p->data+14, "';");
         flv_meta_append_string (flvmeta, "title", source_mp3->url_title);

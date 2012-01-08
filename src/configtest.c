@@ -63,6 +63,7 @@ void _dump_config(ice_config_t *config)
     printf("bind_address = %s\n", config->bind_address);
     printf("base_dir = %s\n", config->base_dir);
     printf("log_dir = %s\n", config->log_dir);
+	printf("json_stats_dir = %s\n", config->json_stats_dir);
     printf("access_log = %s\n", config->access_log);
     printf("error_log = %s\n", config->error_log);
     printf("loglevel = %d\n", config->loglevel);

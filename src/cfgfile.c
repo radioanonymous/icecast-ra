@@ -339,6 +339,7 @@ void config_clear(ice_config_t *c)
     if (c->hostname) xmlFree(c->hostname);
     if (c->base_dir) xmlFree(c->base_dir);
     if (c->log_dir) xmlFree(c->log_dir);
+	if (c->json_stats_dir) xmlFree(c->json_stats_dir);
     if (c->webroot_dir) xmlFree(c->webroot_dir);
     if (c->adminroot_dir) xmlFree(c->adminroot_dir);
     if (c->cert_file) xmlFree(c->cert_file);
@@ -518,6 +519,7 @@ static void _set_defaults(ice_config_t *configuration)
     configuration->master_relay_auth = 0;
     configuration->base_dir = (char *)xmlCharStrdup (CONFIG_DEFAULT_BASE_DIR);
     configuration->log_dir = (char *)xmlCharStrdup (CONFIG_DEFAULT_LOG_DIR);
+	configuration->json_stats_dir = NULL;
     configuration->webroot_dir = (char *)xmlCharStrdup (CONFIG_DEFAULT_WEBROOT_DIR);
     configuration->adminroot_dir = (char *)xmlCharStrdup (CONFIG_DEFAULT_ADMINROOT_DIR);
     configuration->playlist_log.name = (char *)xmlCharStrdup (CONFIG_DEFAULT_PLAYLIST_LOG);
@@ -741,6 +743,7 @@ static int _parse_paths (xmlNodePtr node, void *arg)
     {
         { "basedir",        config_get_str, &config->base_dir },
         { "logdir",         config_get_str, &config->log_dir },
+		{ "jsonstatsdir",	config_get_str, &config->json_stats_dir },
         { "mime-types",     config_get_str, &config->mimetypes_fn },
         { "pidfile",        config_get_str, &config->pidfile },
         { "banfile",        config_get_str, &config->banfile },

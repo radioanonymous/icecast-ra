@@ -274,6 +274,7 @@ typedef struct ice_config_tag
     char *server_id;
     char *base_dir;
     char *log_dir;
+	char *json_stats_dir;
     char *pidfile;
     char *banfile;
     char *allowfile;

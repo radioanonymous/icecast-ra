@@ -328,6 +328,7 @@ static void update_comments (source_t *source)
             snprintf (metadata, len, "%s", title);
         }
     }
+	json_stats_update(source->mount, ogg_info->artist, ogg_info->title, source->listeners);
     if (metadata)
     {
         logging_playlist (source->mount, metadata, source->listeners);

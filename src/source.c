@@ -1209,6 +1209,7 @@ void source_shutdown (source_t *source, int with_fallback)
     }
     if (mountinfo && with_fallback && global.running == ICE_RUNNING)
         source_set_fallback (source, mountinfo->fallback_mount);
+	json_stats_stop(source->mount);
     config_release_config();
     source->client->timer_start = source->client->worker->current_time.tv_sec;
     source->flags |= (SOURCE_TERMINATING | SOURCE_LISTENERS_SYNC);

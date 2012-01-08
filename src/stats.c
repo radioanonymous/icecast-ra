@@ -1451,3 +1451,69 @@ void stats_listener_to_xml (client_t *listener, xmlNodePtr parent)
     }
 }
 
+static const char* json_filename(const char *basedir, const char *mount)
+{
+	static char fpath[1024];
+	snprintf(fpath, sizeof(fpath), "%s/%s.js", basedir, mount[0] == '/' ? mount + 1 : mount);
+	return fpath;
+}
+
+static inline char json_need2escape(char c)
+{
+	return c == '\'' || c == '\\' || c == '"';
+}
+
+static int json_escape_strlen(const char *s)
+{
+	int len = 0;
+	if (s)
+		for (; *s; s++)
+			len += json_need2escape(*s) ? 2 : 1;
+	return len;
+}
+
+static char *json_escape(const char *s, char *d)
+{
+	if (s)
+		while (*s) {
+			if (json_need2escape(*s))
+				*d++ = '\\';
+			*d++ = *s++;
+		}
+	return d;
+}
+
+void json_stats_update(const char *mount, const char *artist, const char *title, long listeners)
+{
+	FILE *json;
+    ice_config_t *config = config_get_config();
+	if (config->json_stats_dir && (json = fopen(json_filename(config->json_stats_dir, mount), "w"))) {
+		static const char mid_str[] = " - ";
+		int mid = artist && title ? sizeof(mid_str) - 1 : 0;
+		char *p, *t = malloc(json_escape_strlen(artist) + json_escape_strlen(title) + mid + 1);
+		p = json_escape(artist, t);
+		if (mid) {
+			memcpy(p, mid_str, sizeof(mid_str) - 1);
+			p += sizeof(mid_str) - 1;
+		}
+		p = json_escape(title, p);
+		*p =0;
+		fprintf(json, "{mount: \"%s\", title: \"%s\", listeners: %ld}\n",
+				mount[0] == '/' ? mount + 1 : mount,
+				t,
+				listeners);
+		free(t);
+		fclose(json);
+	}
+	config_release_config();
+}
+
+void json_stats_stop(const char *mount)
+{
+    ice_config_t *config = config_get_config();
+	if (config->json_stats_dir) {
+		unlink(json_filename(config->json_stats_dir, mount));
+	}
+	config_release_config();
+}
+
