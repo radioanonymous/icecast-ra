@@ -1,56 +1,32 @@
-icecast 2.x - README
----------------------------------------------------------------------
+This file describes new features added in this fork.
+For original icecast README file refer to README.icecast-kh
 
-Icecast is a streaming media server which currently supports Ogg 
-Vorbis and MP3 audio streams. It can be used to create an Internet 
-radio station or a privately running jukebox and many things in 
-between. It is very versatile in that new formats can be added 
-relatively easily and supports open standards for commuincation and 
-interaction.
+* Automatic charset conversions for Russian language - works without any
+  additional settings. If you found error in charset conversions, please
+  report a bug and upload file with broken tags somewhere.
 
-Icecast is distributed under the GNU GPL, version 2. A copy of this
-license is included with this software in the COPYING file.
+* Mounts status in json format as static files suitable to serve with any
+  web-server.
+  To activate this feature add parameter "jsonstatsdir" to icecast config
+  into section "paths" and make sure that specified directory exists and
+  writeable by icecast process.
+  Mount status files have following format:
+  {mount: "ices", title: "65Daysofstatic - Radio Protector", listeners: 0}
 
-Prerequisites
----------------------------------------------------------------------
-icecast requires the following packages :
-
-* libxml2 - http://xmlsoft.org/downloads.html
-* libxslt - http://xmlsoft.org/XSLT/downloads.html
-* curl - http://curl.haxx.se/download.html (>= version 7.10 required)
-  NOTE: icecast may be compiled without curl, however this will
-        disable all Directory server interaction (YP).
-* ogg/vorbis - http://www.vorbis.com/files (>= version 1.0 required)
-
-A Note About RPMS
----------------------------------------------------------------------
-This section only applies to you if your operating system uses RPMS.
-
-In order to build icecast, you will need to install the "devel" RPM
-packages for each of the prerequisite packages in addition to the
-normal RPMS for each package.
-
-please check the websites for each of the prerequisite packages for
-appropriate download links for RPMS.
-
-
-Build/Install
----------------------------------------------------------------------
-To build icecast on a Unix platform, perform the following :
-
-Run
-   ./configure
-   make
-   make install
-
-To build and install this release.
-
-A sample config file will be placed in /usr/local/etc (on UNIX) or in 
-the current working directory (on Win32) and is called icecast.xml
-
-Documentation for icecast is available in the doc directory, by 
-viewing doc/index.html in a browser.
-
-Please email us at icecast@xiph.org or icecast-dev@xiph.org, or come and see
-us at irc.freenode.net, channel #icecast, if you have any troubles.
-
+* Machine-friendly status page: /status-raw.xsl:
+  $ curl http://localhost:8000/status-raw.xsl
+  <?xml version="1.0" encoding="UTF-8"?>
+  <status>
+    <mount id="/ices">
+      <stream-title>Default stream name</stream-title>
+      <stream-description>Default description</stream-description>
+      <content-type>audio/mpeg</content-type>
+      <mount-start>Tue, 10 Jan 2012 22:25:06 +0400</mount-start>
+      <bitrate>128</bitrate>
+      <listeners>0</listeners>
+      <peak-listeners>0</peak-listeners>
+      <genre>Default genre</genre>
+      <server-url>http://www.icecast.org/</server-url>
+      <current-song>65Daysofstatic - Radio Protector</current-song>
+    </mount>
+  </status>
