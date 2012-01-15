@@ -939,7 +939,6 @@ static int command_fallback (client_t *client, source_t *source, int response)
     return client_send_400 (client, "no mount details available");
 }
 
-
 static int command_metadata (client_t *client, source_t *source, int response)
 {
     const char *song, *title, *artist, *artwork, *charset, *url;
@@ -966,6 +965,42 @@ static int command_metadata (client_t *client, source_t *source, int response)
         if (strcmp (client->connection.ip, source->client->connection.ip) != 0)
             if (response == RAW && connection_check_admin_pass (client->parser) == 0)
                 same_ip = 0;
+
+	/* Update stream metadata if needed */
+	if (same_ip) {
+		static const struct {
+			const char		*param;
+			const char		*stat_name;
+			const char		*hdr[3];
+		} fwd[] = {
+			{"xstreamname",			"server_name", 			{"ice-name",		"icy-name",			"x-audiocast-name"}},
+			{"xstreamdesc",			"server_description",	{"ice-description",	"icy-description",	"x-audiocast-description"}},
+			{"xstreamurl",			"server_url",			{"ice-url",			"icy-url",			"x-audiocast-url"}},
+			{"xstreamgenre",		"genre",				{"ice-genre",		"icy-genre",		"x-audiocast-genre"}}
+		};
+		unsigned i;
+		for (i = 0; i < sizeof(fwd) / sizeof(*fwd); i++) {
+			const char *value;
+			unsigned j;
+			COMMAND_OPTIONAL(client, fwd[i].param, value);
+			if (value && *value) {
+				if (source->format->charset)
+					stats_set_conv (source->stats, fwd[i].stat_name, value, source->format->charset);
+				else
+					stats_set (source->stats, fwd[i].stat_name, value);
+			} else if (value) {
+				stats_set (source->stats, fwd[i].stat_name, NULL);
+			}
+			for (j = 0; j < 3; j++) {
+				if (j == 0 && value && *value) {
+					httpp_setvar(source->format->parser, fwd[i].hdr[j], value);
+				} else if (value && !*value) {
+					httpp_deletevar(source->format->parser, fwd[i].hdr[j]);
+				}
+			}
+		}
+
+	}
 
     do
     {
