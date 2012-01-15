@@ -984,6 +984,7 @@ static int command_metadata (client_t *client, source_t *source, int response)
 			unsigned j;
 			COMMAND_OPTIONAL(client, fwd[i].param, value);
 			if (value && *value) {
+				value = auto_recode(value);
 				if (source->format->charset)
 					stats_set_conv (source->stats, fwd[i].stat_name, value, source->format->charset);
 				else
