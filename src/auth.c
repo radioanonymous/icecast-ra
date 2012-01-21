@@ -28,6 +28,7 @@
 
 #include "auth.h"
 #include "auth_htpasswd.h"
+#include "auth_radio.h"
 #include "auth_cmd.h"
 #include "auth_url.h"
 #include "source.h"

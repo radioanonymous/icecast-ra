@@ -34,6 +34,7 @@
 #include "httpp/httpp.h"
 #include "md5.h"
 #include "global.h"
+#include "stats.h"
 
 #include "logging.h"
 #define CATMODULE "auth_radio"
@@ -190,8 +191,13 @@ static void radio_auth (auth_client *auth_user)
 		if (memcmp(md5, u->md5id, 32) == 0)
 			break;
 
-	if (u && u->blocked_till < time(NULL))
+	if (u && u->blocked_till < time(NULL)) {
+		INFO2("SOURCE: %s authenticated on %s", u->id, auth_user->mount);
 		auth_user->client->flags |= CLIENT_AUTHENTICATED;
+		stats_event(auth_user->mount, "dj_nick", u->nick);
+		stats_event(auth_user->mount, "dj_id", u->id);
+		stats_event(auth_user->mount, "skype", u->skype);
+	}
 
 	free(md5);
 	thread_rwlock_unlock(&state->file_rwlock);
