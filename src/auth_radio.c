@@ -183,6 +183,8 @@ static void radio_auth (auth_client *auth_user)
     auth_t *auth = auth_user->auth;
     radio_auth_state *state = auth->state;
 	const char *pass = auth_user->client->password;
+	if (!pass)
+		return;
 	char *md5 = get_hash(pass, strlen(pass));
 	radio_user *u;
 	update_acl(state);

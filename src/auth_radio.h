@@ -10,8 +10,8 @@
  *                      and others (see AUTHORS for details).
  */
 
-#ifndef __AUTH_HTPASSWD_H__
-#define __AUTH_HTPASSWD_H__
+#ifndef __AUTH_RADIO_H__
+#define __AUTH_RADIO_H__
 
 
 int auth_get_radio_auth (auth_t *auth, config_options_t *options);
