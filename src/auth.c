@@ -684,6 +684,12 @@ static int get_authenticator (auth_t *auth, config_options_t *options)
                 return -1;
             break;
         }
+		if (strcmp (auth->type, "radio") == 0)
+		{
+			if (auth_get_radio_auth (auth, options) < 0)
+				return -1;
+			break;
+		}
 
         ERROR1("Unrecognised authenticator type: \"%s\"", auth->type);
         return -1;
