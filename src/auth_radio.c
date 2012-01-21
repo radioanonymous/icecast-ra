@@ -98,6 +98,7 @@ static radio_user *free_user(radio_user *user)
 		free(user->nick);
 	if (user->skype)
 		free(user->skype);
+	free(user);
 	return u;
 }
 
@@ -112,7 +113,7 @@ static int is_separator(char c)
 	return !(c & ~0x1f) || c == ':';
 }
 
-static void update_acl(radio_auth_state *auth)
+static int update_acl(radio_auth_state *auth)
 {
 	int result = 0;
 	struct stat st;
@@ -164,12 +165,15 @@ stop:
 				free_users(auth->users);
 				auth->users = u;
 			} else {
+				printf("ERROR in line %d\n", failure);
 				free_users(u);
+				result = failure + 1;
 			}
 			fclose(in);
 		}
 		thread_rwlock_unlock(&auth->file_rwlock);
 	}
+	return result;
 }
 
 
@@ -185,10 +189,12 @@ static void radio_auth (auth_client *auth_user)
 	for (u = state->users; u; u = u->next)
 		if (memcmp(md5, u->md5id, 32) == 0)
 			break;
-	if (u && u->blocked_till < time(NULL)) {
+
+	if (u && u->blocked_till < time(NULL))
 		auth_user->client->flags |= CLIENT_AUTHENTICATED;
-	}
+
 	free(md5);
+	thread_rwlock_unlock(&state->file_rwlock);
 }
 
 
@@ -216,13 +222,18 @@ int  auth_get_radio_auth (auth_t *authenticator, config_options_t *options)
         return -1;
     }
 
-    authenticator->state = state;
-    DEBUG1("Configured htpasswd authentication using password file %s", 
-            state->filename);
-
     thread_rwlock_create(&state->file_rwlock);
 
-	update_acl(state);
+	int acl = update_acl(state);
+	if (acl != 0) {
+		ERROR2("Error parsing acl file '%s' in line %d\n", state->filename, acl);
+		free(state);
+		return -1;
+	}
+
+    authenticator->state = state;
+    DEBUG1("Configured radio authentication using password file %s",
+            state->filename);
 
     return 0;
 }
